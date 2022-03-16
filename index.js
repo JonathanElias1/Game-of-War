@@ -21,14 +21,14 @@ const myScoreEl = document.getElementById(`my-score`);
 
 drawCardsBtn.addEventListener("click", drawCards);
 
-function handleClick() {
-  fetch("https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/")
-    .then((res) => res.json())
-    .then((data) => {
-      remainingText.textContent = `Remaining cards: ${data.remaining}`;
-      deckId = data.deck_id;
-      console.log(deckId);
-    });
+async function handleClick() {
+  const res = await fetch(
+    "https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/"
+  );
+  const data = await res.json();
+  remainingText.textContent = `Remaining cards: ${data.remaining}`;
+  deckId = data.deck_id;
+  console.log(deckId);
 }
 
 //scrimba defines deckId as deck_id
@@ -41,38 +41,38 @@ newDeckBtn.addEventListener(`click`, handleClick);
 
 drawCardsBtn.addEventListener("click", drawCards);
 
-function drawCards() {
-  fetch(`https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`)
-    .then((res) => res.json())
-    .then((data) => {
-      remainingText.textContent = `Remaining cards: ${data.remaining}`;
-      cardsContainer.children[0].innerHTML = `
+async function drawCards() {
+  const res = await fetch(
+    `https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`
+  );
+  const data = await res.json();
+  {
+    remainingText.textContent = `Remaining cards: ${data.remaining}`;
+    cardsContainer.children[0].innerHTML = `
       <img src=${data.cards[0].image} class="card" />
       `;
-      cardsContainer.children[1].innerHTML = `
+    cardsContainer.children[1].innerHTML = `
           <img src=${data.cards[1].image} class="card" />
       `;
-      //since the children of cards is card slot (based on the html divs),
-      //to make each card act as a different one we use .children with the
-      //id of 0 and 1 and then make the image source of that based on the innerHTML
-      //this places them within our border
-      console.log(myScore);
-      const winnerText = determineCardWinner(data.cards[0], data.cards[1]);
-      console.log(myScore);
-      header.textContent = winnerText;
-      //we put our determine card winner funtion here using the
-      //data from the cards
-      //our function is based on the index value which is based on
-      //our array which is explained in detail below
-      //header.text content will show who won based on the function
+    //since the children of cards is card slot (based on the html divs),
+    //to make each card act as a different one we use .children with the
+    //id of 0 and 1 and then make the image source of that based on the innerHTML
+    //this places them within our border
+    const winnerText = determineCardWinner(data.cards[0], data.cards[1]);
+    header.textContent = winnerText;
+    //we put our determine card winner funtion here using the
+    //data from the cards
+    //our function is based on the index value which is based on
+    //our array which is explained in detail below
+    //header.text content will show who won based on the function
 
-      //here we use gthe data.remaining part of our fetched api to return the amount of
-      //remaining cards which is received from the data included in the api
-      if (data.remaining === 0) {
-        drawCardsBtn.disabled = true;
-        determineTrueWinner();
-      }
-    });
+    //here we use gthe data.remaining part of our fetched api to return the amount of
+    //remaining cards which is received from the data included in the api
+    if (data.remaining === 0) {
+      drawCardsBtn.disabled = true;
+      determineTrueWinner();
+    }
+  }
 }
 
 //here we added a draw cards option NOTE THAT FOR THE DECK ID
@@ -85,22 +85,6 @@ function drawCards() {
 //since we only need 2 images to represent 2 cards we just use the image for position [0]
 //and the image for position [1]. We add a .image and make the whole thing a template literal
 //to make it actually be images indicative of their position
-
-/**
- * Challenge:
- *
- * Keep score! Every time the computer wins a hand, add a point to
- * the computer's score. Do the same for every time you win a hand.
- * If it's a war, no points are awarded to either player. If it's
- * a war (same card values), no one is awarded points.
- *
- * Display the computer's score above the top card, display your
- * own score BELOW the bottom card.
- *
- * Track the scores in a global variable defined at the top of this file
- *
- * Add to the global scores inside the `determinCardWinner` function below.
- */
 
 function determineCardWinner(card1, card2) {
   const valueOptions = [
